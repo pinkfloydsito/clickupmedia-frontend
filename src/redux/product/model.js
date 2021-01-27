@@ -109,7 +109,7 @@ function* fetchfields({ payload }) {
   }
 }
 
-function* submitfields({ payload }) {
+function* submitfields({ push, payload }) {
   yield (put(loading()))
   let response = null
   const {
@@ -125,6 +125,7 @@ function* submitfields({ payload }) {
   } catch (err) {
 
   } finally {
+    yield push('/products/list/')
   }
 }
 

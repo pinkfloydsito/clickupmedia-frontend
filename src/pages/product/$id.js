@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import {
   useRouteMatch,
+  withRouter,
 } from "react-router-dom";
 import { useFormik } from 'formik';
 
-const Edit = () => {
+const Edit = ({ history }) => {
   const dispatch = useDispatch()
   let match = useRouteMatch();
   const formEl = useRef(null);
@@ -32,7 +33,7 @@ const Edit = () => {
   } = product;
 
   const handleSubmit = (values) => {
-    dispatch({type: 'product/submitfields', payload: {...values, id}})
+    dispatch({type: 'product/submitfields', push: history.push, payload: {...values, id}})
   };
 
   const handleReset = () => {
@@ -146,4 +147,4 @@ const Edit = () => {
   );
 }
 
-export default Edit;
+export default withRouter(Edit);

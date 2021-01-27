@@ -1,7 +1,8 @@
+import { all } from "redux-saga/effects";
 import { combineReducers } from "redux";
-import categoryReducer from './category/model'
-import storeReducer from './store/model'
-import productReducer from './product/model'
+import categoryReducer, { saga as categorySaga } from './category/model'
+import storeReducer, { saga as storeSaga } from './store/model'
+import productReducer, { saga as productSaga } from './product/model'
 
 
 const reducer = combineReducers({
@@ -9,5 +10,13 @@ const reducer = combineReducers({
   category: categoryReducer,
   product: productReducer,
 });
+
+export function* rootSaga() {
+  yield all([
+    storeSaga(),
+    productSaga(),
+    categorySaga(),
+  ]);
+}
 
 export default reducer;

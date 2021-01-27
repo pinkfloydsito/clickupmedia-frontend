@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const baseURL = process.env.NODE_ENV === 'production'
-  ? `https://clickupmedia.com/api` : `http://localhost:9000/api`;
+  ? `http://localhost:9000/api` : `http://localhost:9000/api`;
 
 const axiosClient = axios.create({ baseURL });
 

@@ -4,9 +4,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   useRouteMatch,
-  useParams,
   withRouter,
 } from "react-router-dom";
 import { Jumbotron, Button } from 'reactstrap';
@@ -16,6 +14,8 @@ import List from './list';
 
 const Root = ({ history }) => {
   let match = useRouteMatch();
+  const dispatch = useDispatch()
+
   return(
     <>
     <div>
@@ -25,6 +25,7 @@ const Root = ({ history }) => {
         <hr className="my-2" />
         <p className="lead">
           <Button color="primary"onClick={() => {
+            dispatch({type: 'product/clearfields'})
             history.push(`${match.path}/new/`)
           }} >New</Button>
         </p>

@@ -1,11 +1,12 @@
 import { createSlice, createAction } from '@reduxjs/toolkit'
 import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
 import {
-  StoresAPI
+  StoresAPI, ProductsAPI
 } from '../../api/rest-api';
 
 const initialState = {
   data: [],
+  products: [],
 
   /*Fields */
   fields: {
@@ -16,6 +17,7 @@ const initialState = {
     name: null,
     id: null,
     number: null,
+    products: [],
   },
   loading: false,
 }
@@ -67,11 +69,15 @@ const storeSlice = createSlice({
     setfields(state, { payload }) {
       state.fields = { ...payload }
       state.loading = false
-    }
+    },
+    setproducts(state, { payload }) {
+      state.products = [...payload]
+      state.loading = false
+    },
   },
 })
 
-const { set, add, remove, update, loading, updatefield, resetfields, setfields, } = storeSlice.actions
+const { setproducts, set, add, remove, update, loading, updatefield, resetfields, setfields, } = storeSlice.actions
 
 
 function* fetch() {
@@ -99,6 +105,18 @@ function* fetchfields({ payload }) {
   }
 }
 
+function* fetchproducts({ payload }) {
+  yield (put(loading()))
+  let response = []
+  try {
+    response = yield ProductsAPI.list()
+  } catch (err) {
+    console.error(err);
+  } finally {
+    yield put(setproducts(response.data))
+  }
+}
+
 function* submitfields({ push, payload }) {
   yield (put(loading()))
   let response = null
@@ -106,7 +124,6 @@ function* submitfields({ push, payload }) {
     id
   } = payload
   try {
-    console.info(payload)
     delete payload.push
     if (!id) {
       response = yield StoresAPI.post(payload)
@@ -146,6 +163,7 @@ function* deleteitem({ payload: id }) {
 export function* saga() {
   yield takeEvery('store/fetch', fetch);
   yield takeEvery('store/fetchfields', fetchfields);
+  yield takeEvery('store/fetchproducts', fetchproducts);
   yield takeLatest('store/setfield', setfield);
   yield takeLatest('store/clearfields', resetform);
   yield takeLatest('store/submitfields', submitfields);

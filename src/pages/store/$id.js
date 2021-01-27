@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ButtonToggle, FormFeedback, Button, Form, FormGroup, Label, Input, FormText, Spinner } from 'reactstrap';
+import Select from 'react-select';
+import AsyncSelect, { makeAsyncSelect } from 'react-select/async';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import {
@@ -15,6 +17,7 @@ const Edit = ({ history }) => {
   const formEl = useRef(null);
   const store = useSelector(state => state.store);
 
+  const [ selectedProducts, setSelectedProducts ] = useState([])
   const { params: {id} } = match;
   useEffect(() => {
     if(id) {
@@ -22,16 +25,30 @@ const Edit = ({ history }) => {
     }
   }, [id])
 
+  useEffect(() => {
+    dispatch({type: 'store/fetchproducts', payload: { id }})
+  }, [])
+
   const {
     loading,
+    products,
     fields : {
-      name, country, street, city, zip_code, number,
+      name, country, street, city, zip_code, number, products: products_attributes,
     }
   } = store;
+
+  useEffect(() => {
+    setSelectedProducts(products_attributes.map(item => ({value: item.id, label: item.name})))
+  }, [products_attributes])
+
 
   const handleSubmit = (values) => {
     dispatch({type: 'store/submitfields', push: history.push, payload: {...values, id}})
   };
+
+  const handleChangeOptions = useCallback((value) => {
+    setSelectedProducts(value)
+  }, [setSelectedProducts])
 
   const validationSchema = Yup.object().shape({
     name: Yup.mixed().required('Name is required!'),
@@ -40,6 +57,8 @@ const Edit = ({ history }) => {
     zip_code: Yup.string().required('Zip code is required!'),
     number: Yup.string().matches(regex.phone, 'Phone number is required'),}
   )
+
+  const productsOptions = products.map((item) => ({value: item.id, label: item.name}))
 
  const formik = useFormik({
    enableReinitialize: true,
@@ -55,8 +74,9 @@ const Edit = ({ history }) => {
     },
     onSubmit: values => {
       formik.resetForm()
-      handleSubmit(values)
-    },
+      console.info(selectedProducts)
+      handleSubmit({...values, products_attributes: selectedProducts.map((item) => ({id: item.value}))}
+                  )},
   });
 
   const handleReset = useCallback(() => {
@@ -145,6 +165,15 @@ const Edit = ({ history }) => {
                invalid={formik.errors.zip_code} />
         {formik.touched.zip_code && formik.errors.zip_code ?
          <FormFeedback valid={false} invalid={true}>Phone zip code is invalid</FormFeedback> : null}
+      </FormGroup>
+
+      <FormGroup>
+      <Select
+        isMulti
+        options={productsOptions}
+        onChange={handleChangeOptions}
+        value={selectedProducts}
+      />
       </FormGroup>
       <ButtonToggle color="primary" type="submit" >Save</ButtonToggle>
       <ButtonToggle color="danger" onClick={handleReset}>Reset</ButtonToggle>

@@ -8,6 +8,7 @@ const axiosClient = axios.create({ baseURL });
 const stores = '/v1/stores'
 const products = '/v1/products'
 const categories = '/v1/categories'
+const keywords = '/v1/keywords'
 
 class StoresAPI {
   static list = () => axiosClient.get(`${stores}/`)
@@ -33,6 +34,14 @@ class CategoriesAPI {
   static remove = (id) => axiosClient.delete(`${categories}/${id}/`, {});
 }
 
+class KeywordsAPI {
+  static list = () => axiosClient.get(`${keywords}/`)
+  static get = (id) => axiosClient.get(`${keywords}/${id}/`)
+  static post = data => axiosClient.post(`${keywords}`, { ...data });
+  static update = (id, data) => axiosClient.patch(`${keywords}/${id}/`, { ...data });
+  static remove = (id) => axiosClient.delete(`${keywords}/${id}/`, {});
+}
+
 export {
-  StoresAPI, ProductsAPI, CategoriesAPI,
+  StoresAPI, ProductsAPI, CategoriesAPI, KeywordsAPI,
 }

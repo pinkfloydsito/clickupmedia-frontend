@@ -1,19 +1,16 @@
 import { createSlice, createAction } from '@reduxjs/toolkit'
 import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
 import {
-  CategoriesAPI
+  CategoriesAPI, KeywordsAPI,
 } from '../../api/rest-api';
 
 const initialState = {
   data: [],
-
+  keywords: [],
   /*Fields */
   fields: {
     name: null,
-    id: null,
-    price: null,
-    color: null,
-    size: null,
+    keywords: [],
   },
   loading: false,
 }
@@ -28,6 +25,10 @@ const categorySlice = createSlice({
     set(state, action) {
       const items = action.payload
       state.data = [...items]
+      state.loading = false
+    },
+    setkeywords(state, { payload }) {
+      state.keywords = [...payload]
       state.loading = false
     },
     add(state, action) {
@@ -69,7 +70,7 @@ const categorySlice = createSlice({
   },
 })
 
-const { set, add, remove, update, loading, updatefield, resetfields, setfields, } = categorySlice.actions
+const { set, add, remove, setkeywords, loading, updatefield, resetfields, setfields, } = categorySlice.actions
 
 
 function* fetch() {
@@ -110,6 +111,7 @@ function* submitfields({ payload }) {
       delete payload.id
       response = yield CategoriesAPI.update(id, payload)
     }
+    yield* fetch()
   } catch (err) {
 
   } finally {
@@ -138,9 +140,22 @@ function* deleteitem({ payload: id }) {
   }
 }
 
+function* fetchkeywords({ payload }) {
+  yield (put(loading()))
+  let response = []
+  try {
+    response = yield KeywordsAPI.list()
+  } catch (err) {
+    console.error(err);
+  } finally {
+    yield put(setkeywords(response.data))
+  }
+}
+
 export function* saga() {
   yield takeEvery('category/fetch', fetch);
   yield takeEvery('category/fetchfields', fetchfields);
+  yield takeEvery('store/fetchkeywords', fetchkeywords);
   yield takeLatest('category/setfield', setfield);
   yield takeLatest('category/clearfields', resetform);
   yield takeLatest('category/submitfields', submitfields);

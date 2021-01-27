@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,15 +9,18 @@ import {
 } from "react-router-dom";
 import { Jumbotron, Button } from 'reactstrap';
 
-import Edit from './$id';
 import List from './list';
+import Edit from './popupedit';
 
 const Root = ({ history }) => {
   let match = useRouteMatch();
   const dispatch = useDispatch()
 
+  const [open, setOpen] = useState(false)
+
   return(
     <>
+      <Edit open={open} setOpen={setOpen}/>
     <div>
       <Jumbotron>
         <h1 className="display-0">Categories!</h1>
@@ -26,18 +29,12 @@ const Root = ({ history }) => {
         <p className="lead">
           <Button color="primary"onClick={() => {
             dispatch({type: 'category/clearfields'})
-            history.push(`${match.path}/new/`)
+            setOpen(true)
           }} >New</Button>
         </p>
       </Jumbotron>
     </div>
       <Switch>
-        <Route path={`${match.path}/new`}>
-          <Edit />
-        </Route>
-        <Route path={`${match.path}/edit/:id`}>
-          <Edit />
-        </Route>
         <Route path={`${match.path}/list/`}>
           <List />
         </Route>

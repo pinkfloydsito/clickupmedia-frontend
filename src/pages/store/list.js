@@ -5,7 +5,7 @@ import {
   withRouter
 } from "react-router-dom";
 import confirm from "reactstrap-confirm";
-import { Table, ButtonToggle, ButtonGroup } from 'reactstrap';
+import { Badge, Table, ButtonToggle, ButtonGroup } from 'reactstrap';
 
 const List = ({ history }) => {
   const dispatch = useDispatch()
@@ -44,7 +44,7 @@ const List = ({ history }) => {
 
 
   const rows = useMemo(() => {
-    return data.map(({id, name, street, zip_code, city, country}) =>
+    return data.map(({id, name, street, zip_code, city, country, products}) =>
       <tr key={id}>
         <th scope="row">{id}</th>
         <td>{name}</td>
@@ -52,7 +52,7 @@ const List = ({ history }) => {
         <td>{zip_code}</td>
         <td>{city}</td>
         <td>{country}</td>
-        <td>---</td>
+        <td>{products.map(item => (<Badge color="light" pill>{item.name}</Badge>))}</td>
         <td>
       <ButtonGroup>
         <ButtonToggle color="primary" onClick={() => onEdit(id)}>Edit</ButtonToggle>
